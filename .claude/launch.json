@@ -1,0 +1,14 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "web",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--dir", "apps/web", "run", "dev"],
+      "port": 3000,
+      "env": {
+        "PATH": "/c/Program Files/nodejs:${env:PATH}"
+      }
+    }
+  ]
+}
