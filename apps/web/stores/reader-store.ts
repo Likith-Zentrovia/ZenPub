@@ -253,7 +253,6 @@ export const useReaderStore = create<ReaderState>()(
       name: "zenpub-reader-settings",
       partialize: (state) => ({
         theme: state.theme,
-        fontSize: state.fontSize,
       }),
     }
   )

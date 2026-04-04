@@ -86,7 +86,8 @@ export default function EpubRenderer() {
       if (fontSize > 100) {
         const scale = fontSize / 100;
         if (container) {
-          container.style.overflow = "auto";
+          container.style.overflowX = "hidden";
+          container.style.overflowY = "auto";
         }
         if (views?._views) {
           views._views.forEach((view: any) => {
@@ -98,7 +99,8 @@ export default function EpubRenderer() {
         }
       } else {
         if (container) {
-          container.style.overflow = "";
+          container.style.overflowX = "";
+          container.style.overflowY = "";
         }
         if (views?._views) {
           views._views.forEach((view: any) => {
