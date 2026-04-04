@@ -149,18 +149,8 @@ export const useReaderStore = create<ReaderState>()(
         const clamped = Math.min(150, Math.max(80, size));
         const { rendition } = get();
         if (rendition) {
-          applyFontSize(rendition, clamped);
-          // Switch to scrolled mode when zoomed so excess content is
-          // scrollable instead of spilling into the next page
-          try {
-            if (clamped > 100) {
-              rendition.flow("scrolled-doc");
-            } else {
-              rendition.flow("paginated");
-            }
-          } catch {
-            // Ignore if flow switching not supported
-          }
+          // When zoomed (>100%), keep epub at 100% — CSS zoom handles the rest
+          applyFontSize(rendition, Math.min(clamped, 100));
         }
         set({ fontSize: clamped });
       },
