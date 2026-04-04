@@ -24,7 +24,7 @@ export function FontControls() {
               size="icon"
               className="h-7 w-7"
               onClick={() => setFontSize(fontSize - 10)}
-              disabled={fontSize <= 80}
+              disabled={fontSize <= 100}
               aria-label="Decrease font size"
             >
               <Minus className="h-3 w-3" />

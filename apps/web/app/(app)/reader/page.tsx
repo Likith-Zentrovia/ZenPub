@@ -78,8 +78,8 @@ export default function ReaderPage() {
       {/* Toolbar */}
       <ReaderToolbar />
 
-      {/* Main content area — allow scroll when zoomed in */}
-      <main className={`relative flex-1 ${fontSize > 100 ? "overflow-y-auto" : "overflow-hidden"}`}>
+      {/* Main content area */}
+      <main className="relative flex-1 overflow-hidden">
         <EpubRendererWrapper />
       </main>
 

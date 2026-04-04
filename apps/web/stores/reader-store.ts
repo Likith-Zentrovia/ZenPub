@@ -146,11 +146,10 @@ export const useReaderStore = create<ReaderState>()(
       },
 
       setFontSize: (size: number) => {
-        const clamped = Math.min(150, Math.max(80, size));
+        const clamped = Math.min(150, Math.max(100, size));
         const { rendition } = get();
         if (rendition) {
-          // When zoomed (>100%), keep epub at 100% — CSS zoom handles the rest
-          applyFontSize(rendition, Math.min(clamped, 100));
+          applyFontSize(rendition, clamped);
         }
         set({ fontSize: clamped });
       },

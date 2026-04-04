@@ -70,18 +70,8 @@ export default function EpubRenderer() {
 
   if (!bookInstance) return null;
 
-  const isZoomed = fontSize > 100;
-
   return (
-    <div
-      className="h-full w-full"
-      style={{
-        position: "relative",
-        // CSS zoom scales the current page visually while keeping
-        // paginated layout intact — parent scrolls to show overflow
-        ...(isZoomed && { zoom: fontSize / 100 }),
-      }}
-    >
+    <div className="h-full w-full" style={{ position: "relative" }}>
       <ReactReader
         url={bookInstance.arrayBuffer}
         location={location}
