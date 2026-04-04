@@ -21,6 +21,29 @@ export default function EpubRenderer() {
 
   const handleGetRendition = useCallback(
     (rendition: any) => {
+      // Monkey-patch next() to handle cover page navigation
+      // Cover pages (spine index 0) are often single-page images where
+      // rendition.next() fails silently — force-skip to next spine item
+      const originalNext = rendition.next.bind(rendition);
+      rendition.next = function () {
+        try {
+          const loc = rendition.currentLocation();
+          if (loc?.start?.index === 0) {
+            const displayed = loc.start?.displayed;
+            // On last page of first section (cover) — jump to next section
+            if (displayed && displayed.page >= displayed.total) {
+              const nextItem = rendition.book.spine.get(1);
+              if (nextItem) {
+                return rendition.display(nextItem.href);
+              }
+            }
+          }
+        } catch {
+          // Fall through to original next
+        }
+        return originalNext();
+      };
+
       setRendition(rendition);
 
       // Apply theme

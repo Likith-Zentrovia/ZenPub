@@ -150,6 +150,17 @@ export const useReaderStore = create<ReaderState>()(
         const { rendition } = get();
         if (rendition) {
           applyFontSize(rendition, clamped);
+          // Switch to scrolled mode when zoomed so excess content is
+          // scrollable instead of spilling into the next page
+          try {
+            if (clamped > 100) {
+              rendition.flow("scrolled-doc");
+            } else {
+              rendition.flow("paginated");
+            }
+          } catch {
+            // Ignore if flow switching not supported
+          }
         }
         set({ fontSize: clamped });
       },
