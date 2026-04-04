@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { ReactReader } from "react-reader";
 import { useReaderStore } from "@/stores/reader-store";
 import { THEME_CONFIGS } from "@zenpub/epub-utils";
@@ -12,6 +12,7 @@ export default function EpubRenderer() {
   const setLocationsReady = useReaderStore((s) => s.setLocationsReady);
   const theme = useReaderStore((s) => s.theme);
   const fontSize = useReaderStore((s) => s.fontSize);
+  const rendition = useReaderStore((s) => s.rendition);
 
   const [location, setLocation] = useState<string | number>(0);
 
@@ -50,7 +51,8 @@ export default function EpubRenderer() {
       const config = THEME_CONFIGS[theme];
       rendition.themes.override("color", config.text);
       rendition.themes.override("background", config.body);
-      rendition.themes.fontSize(`${fontSize}%`);
+      // Always render at 100% font — zoom is handled via CSS on the iframe
+      rendition.themes.fontSize("100%");
 
       // Listen for relocations to track progress
       rendition.on("relocated", (location: any) => {
@@ -65,8 +67,61 @@ export default function EpubRenderer() {
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [setRendition, theme, fontSize]
+    [setRendition, theme]
   );
+
+  // Apply CSS zoom to the epub iframe when fontSize > 100%.
+  // This scales the rendered page output without changing pagination —
+  // page boundaries stay fixed, and the container scrolls to show overflow.
+  useEffect(() => {
+    if (!rendition) return;
+
+    const applyZoom = () => {
+      const manager = rendition.manager;
+      if (!manager) return;
+
+      const container = manager.container;
+      const views = manager.views;
+
+      if (fontSize > 100) {
+        const scale = fontSize / 100;
+        if (container) {
+          container.style.overflow = "auto";
+        }
+        if (views?._views) {
+          views._views.forEach((view: any) => {
+            if (view.iframe) {
+              view.iframe.style.transform = `scale(${scale})`;
+              view.iframe.style.transformOrigin = "top left";
+            }
+          });
+        }
+      } else {
+        if (container) {
+          container.style.overflow = "";
+        }
+        if (views?._views) {
+          views._views.forEach((view: any) => {
+            if (view.iframe) {
+              view.iframe.style.transform = "";
+              view.iframe.style.transformOrigin = "";
+            }
+          });
+        }
+      }
+    };
+
+    // Apply now and on every new page render
+    applyZoom();
+    rendition.on("rendered", applyZoom);
+    return () => {
+      try {
+        rendition.off("rendered", applyZoom);
+      } catch {
+        // ignore if rendition was destroyed
+      }
+    };
+  }, [rendition, fontSize]);
 
   if (!bookInstance) return null;
 

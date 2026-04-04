@@ -105,9 +105,10 @@ export const useReaderStore = create<ReaderState>()(
       },
 
       setRendition: (rendition: any) => {
-        const { theme, fontSize, bookInstance } = get();
+        const { theme, bookInstance } = get();
         applyTheme(rendition, theme);
-        applyFontSize(rendition, fontSize);
+        // Always 100% font — zoom is handled via CSS transform on iframe
+        applyFontSize(rendition, 100);
 
         // Extract metadata and TOC from the rendition's book
         if (bookInstance) {
@@ -147,10 +148,7 @@ export const useReaderStore = create<ReaderState>()(
 
       setFontSize: (size: number) => {
         const clamped = Math.min(150, Math.max(100, size));
-        const { rendition } = get();
-        if (rendition) {
-          applyFontSize(rendition, clamped);
-        }
+        // Only update state — CSS transform zoom is applied in EpubRenderer
         set({ fontSize: clamped });
       },
 
